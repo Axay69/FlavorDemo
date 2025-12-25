@@ -21,7 +21,7 @@ react {
     //   The list of variants to that are debuggable. For those we're going to
     //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
     //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
-    // debuggableVariants = ["liteDebug", "prodDebug"]
+    debuggableVariants = ["liteDebug", "fullDebug"]
 
     /* Bundling */
     //   A list containing the node command and its flags. Default is just 'node'.
@@ -78,12 +78,50 @@ android {
     compileSdk rootProject.ext.compileSdkVersion
 
     namespace "com.flavourdemo"
+    
+    // Define flavor dimensions
+    flavorDimensions "app"
+    
     defaultConfig {
         applicationId "com.flavourdemo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+    }
+    
+    // Define product flavors
+    productFlavors {
+        lite {
+            dimension "app"
+            applicationIdSuffix ".lite"
+            resValue "string", "app_name", "FlavourDemo Lite"
+            buildConfigField "String", "APP_FLAVOR", "\"lite\""
+            // API Configuration
+            buildConfigField "String", "API_BASE_URL", "\"https://api-lite.example.com/v1\""
+            buildConfigField "String", "API_KEY", "\"lite_api_key_12345\""
+            buildConfigField "int", "API_TIMEOUT", "10000"
+            buildConfigField "boolean", "API_LOGGING_ENABLED", "false"
+            // Feature flags
+            buildConfigField "boolean", "FEATURE_VIDEO_EDITOR", "false"
+            buildConfigField "boolean", "FEATURE_ADS", "true"
+            buildConfigField "boolean", "FEATURE_ANALYTICS", "true"
+        }
+        
+        full {
+            dimension "app"
+            resValue "string", "app_name", "FlavourDemo"
+            buildConfigField "String", "APP_FLAVOR", "\"full\""
+            // API Configuration
+            buildConfigField "String", "API_BASE_URL", "\"https://api-full.example.com/v1\""
+            buildConfigField "String", "API_KEY", "\"full_api_key_67890\""
+            buildConfigField "int", "API_TIMEOUT", "15000"
+            buildConfigField "boolean", "API_LOGGING_ENABLED", "true"
+            // Feature flags
+            buildConfigField "boolean", "FEATURE_VIDEO_EDITOR", "true"
+            buildConfigField "boolean", "FEATURE_ADS", "false"
+            buildConfigField "boolean", "FEATURE_ANALYTICS", "true"
+        }
     }
     signingConfigs {
         debug {

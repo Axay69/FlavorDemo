@@ -1,0 +1,181 @@
+🧱 STEP 0 — Define the Flavor Strategy (Don’t Skip This)
+
+Decide why flavors exist.
+
+Example flavors:
+
+lite → small size, fewer features
+
+full → all features
+
+enterprise → extra native modules
+
+This example will use:
+
+lite
+full
+
+🧩 STEP 1 — JS-Level Flavor Flag (Foundation)
+1.1 Define a global flavor constant
+Android & iOS will inject this
+
+In JS you ONLY consume it.
+
+Create:
+
+// src/config/flavor.ts
+export const APP_FLAVOR = global.__APP_FLAVOR__ as 'lite' | 'full'
+
+
+Usage:
+
+if (APP_FLAVOR === 'lite') {
+  // disable feature
+}
+
+
+⚠️ No .env nonsense here.
+Flavor must come from native build, not runtime config.
+
+🤖 STEP 2 — ANDROID: True Build Flavors (Native Power)
+2.1 Define flavors in android/app/build.gradle
+android {
+  flavorDimensions "app"
+
+  productFlavors {
+    lite {
+      dimension "app"
+      applicationIdSuffix ".lite"
+      resValue "string", "app_name", "MyApp Lite"
+      buildConfigField "String", "APP_FLAVOR", "\"lite\""
+    }
+
+    full {
+      dimension "app"
+      resValue "string", "app_name", "MyApp"
+      buildConfigField "String", "APP_FLAVOR", "\"full\""
+    }
+  }
+}
+
+
+Now Android knows the flavor.
+
+2.2 Expose flavor to React Native JS
+
+Global JS constant (recommended)
+
+Create a custom native module:
+
+@ReactModule(name = "FlavorModule")
+public class FlavorModule extends ReactContextBaseJavaModule {
+  @Override
+  public String getName() {
+    return "FlavorModule";
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public String getFlavor() {
+    return BuildConfig.APP_FLAVOR;
+  }
+}
+
+
+Then in JS bootstrap:
+
+import { NativeModules } from 'react-native'
+
+global.__APP_FLAVOR__ = NativeModules.FlavorModule.getFlavor()
+
+
+🔥 Now JS and Native are hard-linked.
+
+
+🍎 STEP 3 — iOS: Schemes + Build Configs
+3.1 Create Schemes
+
+In Xcode:
+
+Duplicate scheme → MyApp-Lite
+
+Duplicate scheme → MyApp-Full
+
+3.2 Create Build Configs
+
+Debug-Lite
+
+Release-Lite
+
+Debug-Full
+
+Release-Full
+
+3.3 Inject flavor via Info.plist
+
+Add:
+
+<key>APP_FLAVOR</key>
+<string>lite</string>
+
+
+Each scheme has its own value.
+
+3.4 Expose to React Native
+
+Objective-C:
+
+NSString *flavor = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"APP_FLAVOR"];
+
+
+Swift Module:
+
+@objc(FlavorModule)
+class FlavorModule: NSObject {
+  @objc func getFlavor() -> String {
+    return Bundle.main.object(forInfoDictionaryKey: "APP_FLAVOR") as? String ?? "unknown"
+  }
+}
+
+
+Then same JS bootstrap:
+
+global.__APP_FLAVOR__ = NativeModules.FlavorModule.getFlavor()
+
+🎛 STEP 4 — Flavor-Driven Feature Flags (JS + Native)
+4.1 Central feature map
+// src/config/features.ts
+export const FEATURES = {
+  videoEditor: APP_FLAVOR === 'full',
+  ads: APP_FLAVOR === 'lite',
+  analytics: true,
+}
+
+
+Usage:
+
+if (FEATURES.videoEditor) {
+  loadEditor()
+}
+
+4.2 Native feature gating (Android)
+if (BuildConfig.APP_FLAVOR.equals("lite")) {
+  // skip module init
+}
+
+📦 STEP 5 — Reducing App Size (Real Win)
+5.1 Android: Exclude native deps per flavor
+liteImplementation project(":react-native-ads")
+fullImplementation project(":react-native-video-editor")
+
+
+🔥 Lite build does not even compile heavy modules.
+
+5.2 JS: Lazy import
+if (APP_FLAVOR === 'full') {
+  const Editor = await import('./Editor')
+}
+
+
+Bundle size ↓
+Memory ↓
+Startup ↓

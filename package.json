@@ -4,15 +4,24 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
+    "android:lite": "cd android && ./gradlew installLiteDebug && cd ..",
+    "android:full": "cd android && ./gradlew installFullDebug && cd ..",
+    "android:lite:release": "cd android && ./gradlew installLiteRelease && cd ..",
+    "android:full:release": "cd android && ./gradlew installFullRelease && cd ..",
+    "android:build:lite": "cd android && ./gradlew assembleLiteDebug && cd ..",
+    "android:build:full": "cd android && ./gradlew assembleFullDebug && cd ..",
     "ios": "react-native run-ios",
+    "ios:lite": "react-native run-ios --scheme FlavourDemo-Lite",
+    "ios:full": "react-native run-ios --scheme FlavourDemo-Full",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"
   },
   "dependencies": {
+    "@react-native/new-app-screen": "0.81.4",
     "react": "19.1.0",
     "react-native": "0.81.4",
-    "@react-native/new-app-screen": "0.81.4",
+    "react-native-config": "^1.6.1",
     "react-native-safe-area-context": "^5.5.2"
   },
   "devDependencies": {

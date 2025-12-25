@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Full flavor specific strings -->
+    <string name="app_name">FlavourDemo</string>
+    <string name="welcome_message">Welcome to Premium version</string>
+    <string name="upgrade_prompt">You have access to all premium features</string>
+    <string name="api_base_url">https://api-full.example.com/v1</string>
+</resources>
+

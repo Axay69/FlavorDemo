@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Lite flavor specific strings -->
+    <string name="app_name">FlavourDemo Lite</string>
+    <string name="welcome_message">Welcome to the Lite version</string>
+    <string name="upgrade_prompt">Upgrade to Full version for premium features</string>
+    <string name="api_base_url">https://api-lite.example.com/v1</string>
+</resources>
+
